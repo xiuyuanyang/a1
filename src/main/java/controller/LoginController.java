@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +29,7 @@ import utils.RedisUtil;
 @RequestMapping(value = "mobile")
 public class LoginController {
 
+	private Logger logger = LoggerFactory.getLogger(LoginController.class);
 	private static final String tokenExpiresIn = Global.getConfig("token_expires_in");
 
 	@Autowired
@@ -36,7 +39,6 @@ public class LoginController {
 	@ResponseBody
 	public Object login(HttpServletRequest req) {
 
-		// String appVersion = req.getParameter("appversion");
 		String token = req.getParameter("token");
 		ResultBean rb = new ResultBean();
 		Map<String, String> map = new HashMap<String, String>();
@@ -44,6 +46,7 @@ public class LoginController {
 		if (token != null) {
 			token = token.trim();
 			userid = RedisUtil.get(token);
+			logger.info("token != null and get userid = "+ userid);
 			if (userid != null) {
 				RedisUtil.setex(token, Integer.parseInt(tokenExpiresIn), userid);
 				rb.setCode(1);
@@ -72,6 +75,7 @@ public class LoginController {
 		lu.setPassword(password);
 		User u = loginService.getLogin(lu);
 		if (u == null) {
+			logger.info("loginService.getLogin(lu) and user is null ");
 			rb.setCode(MessageConstants.error.getValue());
 			rb.setMessage("login fail , wrong password or mobile");
 		} else {
@@ -106,6 +110,7 @@ public class LoginController {
 			password = password.trim();
 			User u = new User();
 			u.setMobile(mobile);
+			logger.info("register user and password = "+password);
 			password = MD5.getMD5Code(password);
 			u.setPassword(password);
 			u.setUsername(username);

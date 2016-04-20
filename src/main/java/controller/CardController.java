@@ -12,9 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,26 +26,46 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import beans.NameCard;
 import beans.ResultBean;
 import service.NameCardService;
+import utils.Global;
 import utils.MessageConstants;
+import utils.RedisUtil;
 
 @Controller
 @RequestMapping("/card")
 public class CardController {
 
+	private Logger logger = LoggerFactory.getLogger(CardController.class);
+	private static final String tokenExpiresIn = Global.getConfig("token_expires_in");
+	
 	@Autowired
 	ServletContext servletContext;
 
 	@Autowired
 	private NameCardService nameCardService;
 
-	@RequestMapping("/get")
+	@RequestMapping(value ="/get", method = RequestMethod.POST)
 	@ResponseBody
 	public Object getCard(HttpServletRequest req, HttpServletResponse res) {
 
-		int id = Integer.parseInt(req.getParameter("id"));
-		int uid = Integer.parseInt(req.getParameter("uid"));
-		NameCard nc = nameCardService.getOneCard(id, uid);
+		String token = req.getParameter("token");
+		String userid ;
 		ResultBean rb = new ResultBean();
+		if (token != null) {
+			token = token.trim();
+			userid = RedisUtil.get(token);
+			logger.info("token != null and get userid = "+ userid);
+			if (userid != null) {
+				RedisUtil.setex(token, Integer.parseInt(tokenExpiresIn), userid);
+			}
+		} else {
+			rb.setCode(0);
+			rb.setMessage("upload without token");
+			return rb;
+		}
+		
+		int id = Integer.parseInt(req.getParameter("id"));
+		int uid = Integer.parseInt(userid);
+		NameCard nc = nameCardService.getOneCard(id, uid);
 
 		if (nc == null) {
 			rb.setCode(MessageConstants.error.getValue());
@@ -62,8 +83,24 @@ public class CardController {
 	@ResponseBody
 	public Object addCard(HttpServletRequest req, HttpServletResponse res, @RequestBody NameCard nc) {
 
+		String token = req.getParameter("token");
+		String userid ;
 		ResultBean rb = new ResultBean();
+		if (token != null) {
+			token = token.trim();
+			userid = RedisUtil.get(token);
+			logger.info("token != null and get userid = "+ userid);
+			if (userid != null) {
+				RedisUtil.setex(token, Integer.parseInt(tokenExpiresIn), userid);
+			}
+		} else {
+			rb.setCode(0);
+			rb.setMessage("upload without token");
+			return rb;
+		}
 
+		nc.setUid(Integer.parseInt(userid));
+		
 		if (nameCardService.addOneCard(nc)) {
 			rb.setMessage("upload success");
 			rb.setCode(MessageConstants.success.getValue());
@@ -94,7 +131,7 @@ public class CardController {
 		return null;
 	}
 
-	@RequestMapping("/remove")
+	@RequestMapping(value ="/remove", method = RequestMethod.POST)
 	@ResponseBody
 	public String removeCard(HttpServletRequest req, HttpServletResponse res) {
 		PrintWriter out = null;
@@ -111,14 +148,28 @@ public class CardController {
 		return "index";
 	}
 
-	@RequestMapping("/count")
+	@RequestMapping(value ="/count", method = RequestMethod.POST)
 	@ResponseBody
 	public Object countCards(HttpServletRequest req, HttpServletResponse res) {
-//		PrintWriter out = null;		
+		
+		String token = req.getParameter("token");
+		String userid ;
 		ResultBean rb = new ResultBean();
-		List<Integer> r = nameCardService.countCards(1);
+		if (token != null) {
+			token = token.trim();
+			userid = RedisUtil.get(token);
+			logger.info("token != null and get userid = "+ userid);
+			if (userid != null) {
+				RedisUtil.setex(token, Integer.parseInt(tokenExpiresIn), userid);
+			}
+		} else {
+			rb.setCode(0);
+			rb.setMessage("upload without token");
+			return rb;
+		}
+
+		List<Integer> r = nameCardService.countCards(Integer.parseInt(userid));
 		try {
-//			out = res.getWriter();	
 			rb.setCode(MessageConstants.success.getValue());
 			rb.setMessage("count cards success");
 			rb.setData(r);
@@ -133,7 +184,7 @@ public class CardController {
 		return rb;
 	}
 
-	@RequestMapping("/all")
+	@RequestMapping(value ="/all", method = RequestMethod.POST)
 	@ResponseBody
 	public Object getAllCards(HttpServletRequest req, HttpServletResponse res) {
 

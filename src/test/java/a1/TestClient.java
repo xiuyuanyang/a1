@@ -20,10 +20,10 @@ public class TestClient {
 
 	public static void testlogin() {
 
-		String url2 = "http://localhost:8080/a1-0.0.1-SNAPSHOT/mobile/login/";
+		String url2 = "http://172.17.17.125:8080/a1-0.0.1-SNAPSHOT/mobile/login/";
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("token", "2e5de99a9bd74c72b9c3391a834df5c2"));
-		params.add(new BasicNameValuePair("username", "admin"));
+//		params.add(new BasicNameValuePair("token", "2e5de99a9bd74c72b9c3391a834df5c2"));
+//		params.add(new BasicNameValuePair("username", "admin"));
 		params.add(new BasicNameValuePair("password", "123456"));
 		params.add(new BasicNameValuePair("mobile", "13588775565"));
 		try {
@@ -72,6 +72,8 @@ public class TestClient {
 		params.add(new BasicNameValuePair("username", "admin"));
 		params.add(new BasicNameValuePair("password", "123456"));
 		params.add(new BasicNameValuePair("mobile", "13588775565"));
+		
+		params.add(new BasicNameValuePair("token", "dd081a50d2804a548feb05bd87d020f2"));
 		try {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
 
@@ -136,8 +138,8 @@ public class TestClient {
 //		
 //		for (int g =0 ; g < 10 ; g++)
 //		System.out.println(IdGen.randomInt(6));
-		
-		TestClient.testlogin();
+	//	TestClient.testlogin();
+		TestClient.all();
 
 	}
 
