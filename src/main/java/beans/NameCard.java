@@ -1,123 +1,148 @@
 package beans;
 
 public class NameCard {
-    private Integer id;
+	private Integer id;
+	private Integer uid;
+	private String name;
+	private String photolink;
+	private String company;
+	private String title;
+	private String email;
+	private String phone;
+	private String fax;
+	private int selected;
+	private String mobile;
+	private String address;
+	private String website;
+	private int seriesNumber;
+	private int language;
+	private int themeType;
 
-    private String name;
+	public String getPhone() {
+		return phone;
+	}
 
-    private String photolink;
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 
-    private String company;
+	public String getFax() {
+		return fax;
+	}
 
-    private String title;
+	public void setFax(String fax) {
+		this.fax = fax;
+	}
 
-    private String email;
+	public int getSelected() {
+		return selected;
+	}
 
-    private String phone1;
+	public void setSelected(int selected) {
+		this.selected = selected;
+	}
 
-    private String phone2;
+	public int getSeriesNumber() {
+		return seriesNumber;
+	}
 
-    private String phone3;
+	public void setSeriesNumber(int seriesNumber) {
+		this.seriesNumber = seriesNumber;
+	}
 
-    private String mobile;
+	public int getLanguage() {
+		return language;
+	}
 
-    private String address;
+	public void setLanguage(int language) {
+		this.language = language;
+	}
 
-    private String website;
+	public int getThemeType() {
+		return themeType;
+	}
 
-    public Integer getId() {
-        return id;
-    }
+	public void setThemeType(int themeType) {
+		this.themeType = themeType;
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public Integer getId() {
+		return id;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    public void setName(String name) {
-        this.name = name == null ? null : name.trim();
-    }
+	public Integer getUid() {
+		return uid;
+	}
 
-    public String getPhotolink() {
-        return photolink;
-    }
+	public void setUid(Integer uid) {
+		this.uid = uid;
+	}
 
-    public void setPhotolink(String photolink) {
-        this.photolink = photolink == null ? null : photolink.trim();
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getCompany() {
-        return company;
-    }
+	public void setName(String name) {
+		this.name = name == null ? null : name.trim();
+	}
 
-    public void setCompany(String company) {
-        this.company = company == null ? null : company.trim();
-    }
+	public String getPhotolink() {
+		return photolink;
+	}
 
-    public String getTitle() {
-        return title;
-    }
+	public void setPhotolink(String photolink) {
+		this.photolink = photolink == null ? null : photolink.trim();
+	}
 
-    public void setTitle(String title) {
-        this.title = title == null ? null : title.trim();
-    }
+	public String getCompany() {
+		return company;
+	}
 
-    public String getEmail() {
-        return email;
-    }
+	public void setCompany(String company) {
+		this.company = company == null ? null : company.trim();
+	}
 
-    public void setEmail(String email) {
-        this.email = email == null ? null : email.trim();
-    }
+	public String getTitle() {
+		return title;
+	}
 
-    public String getPhone1() {
-        return phone1;
-    }
+	public void setTitle(String title) {
+		this.title = title == null ? null : title.trim();
+	}
 
-    public void setPhone1(String phone1) {
-        this.phone1 = phone1 == null ? null : phone1.trim();
-    }
+	public String getEmail() {
+		return email;
+	}
 
-    public String getPhone2() {
-        return phone2;
-    }
+	public void setEmail(String email) {
+		this.email = email == null ? null : email.trim();
+	}
 
-    public void setPhone2(String phone2) {
-        this.phone2 = phone2 == null ? null : phone2.trim();
-    }
+	public String getMobile() {
+		return mobile;
+	}
 
-    public String getPhone3() {
-        return phone3;
-    }
+	public void setMobile(String mobile) {
+		this.mobile = mobile == null ? null : mobile.trim();
+	}
 
-    public void setPhone3(String phone3) {
-        this.phone3 = phone3 == null ? null : phone3.trim();
-    }
+	public String getAddress() {
+		return address;
+	}
 
-    public String getMobile() {
-        return mobile;
-    }
+	public void setAddress(String address) {
+		this.address = address == null ? null : address.trim();
+	}
 
-    public void setMobile(String mobile) {
-        this.mobile = mobile == null ? null : mobile.trim();
-    }
+	public String getWebsite() {
+		return website;
+	}
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address == null ? null : address.trim();
-    }
-
-    public String getWebsite() {
-        return website;
-    }
-
-    public void setWebsite(String website) {
-        this.website = website == null ? null : website.trim();
-    }
+	public void setWebsite(String website) {
+		this.website = website == null ? null : website.trim();
+	}
 }

@@ -20,14 +20,25 @@
 		SELECT *
 		FROM NameCard WHERE id=#{id};
 	</select>
-	<insert id="addNameCard" parameterType="String" flushCache="true">
-		INSERT INTO NameCard (id,username,password) VALUES
-		(#{id},#{username},#{password})
+	<insert id="addNameCard" parameterType="beans.NameCard" flushCache="true" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO NameCard (id,name,photolink,company,title,email,phone1,phone2,phone3,mobile,address,website) VALUES
+		(#{id},#{name},#{photolink},#{company},#{title},#{email},#{phone1},#{phone2},#{phone3},#{mobile},#{address},#{website});
 	</insert>
-	<update id="updateNameCard" parameterType="String">
+	<update id="updateNameCard" parameterType="beans.NameCard">
 		UPDATE NameCard
 		SET
-		password=#{password} WHERE id=#{id}
+		name=#{name},
+		photolink=#{photolink},
+		company=#{company},
+		title=#{title},
+		email=#{email}, 
+		phone1=#{phone1},
+		phone2=#{phone2},
+		phone3=#{phone3},
+		mobile=#{mobile},
+		address=#{address},
+		website=#{website}
+		WHERE id=#{id}
 	</update>
 	<delete id="deleteNameCard" parameterType="int">
 		DELETE FROM

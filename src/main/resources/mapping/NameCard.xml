@@ -3,37 +3,90 @@
 <mapper namespace="dao.NameCardDao">
 	<resultMap id="BaseResultMap" type="beans.NameCard">
 		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="uid" property="uid" jdbcType="INTEGER" />
 		<result column="name" property="name" jdbcType="VARCHAR" />
 		<result column="photolink" property="photolink" jdbcType="VARCHAR" />
 		<result column="company" property="company" jdbcType="VARCHAR" />
 		<result column="title" property="title" jdbcType="VARCHAR" />
 		<result column="email" property="email" jdbcType="VARCHAR" />
-		<result column="phone1" property="phone1" jdbcType="VARCHAR" />
-		<result column="phone2" property="phone2" jdbcType="VARCHAR" />
-		<result column="phone3" property="phone3" jdbcType="VARCHAR" />
+		<result column="phone" property="phone" jdbcType="VARCHAR" />
 		<result column="mobile" property="mobile" jdbcType="VARCHAR" />
 		<result column="address" property="address" jdbcType="VARCHAR" />
 		<result column="website" property="website" jdbcType="VARCHAR" />
+		<result column="fax" property="fax" jdbcType="VARCHAR" />
+		<result column="selected" property="selected" jdbcType="INTEGER" />
+		<result column="seriesNumber" property="seriesNumber" jdbcType="INTEGER" />
+		<result column="language" property="language" jdbcType="INTEGER" />
+		<result column="themeType" property="themeType" jdbcType="INTEGER" />
 	</resultMap>
 
-	<select id="getNameCard" parameterType="int" resultMap="BaseResultMap" resultType="beans.NameCard">
+	<select id="getNameCard" resultMap="BaseResultMap" resultType="beans.NameCard">
 		SELECT *
-		FROM NameCard WHERE id=#{id};
+		FROM NameCard WHERE id=#{0} and uid=#{1};
 	</select>
-	<insert id="addNameCard" parameterType="String" flushCache="true">
-		INSERT INTO NameCard (id,username,password) VALUES
-		(#{id},#{username},#{password})
+	<insert id="addNameCard" parameterType="beans.NameCard">
+		INSERT INTO NameCard
+		(id,uid,name,photolink,company,title,email,phone,mobile,address,website,fax,selected,seriesNumber,language,themeType)
+		VALUES
+		(#{id},#{uid},#{name},#{photolink},#{company},#{title},#{email},#{phone},#{mobile},#{address},#{website},#{fax},#{selected},#{seriesNumber},#{language},#{themeType})
+		ON DUPLICATE KEY
+		UPDATE
+		name=#{name},
+		photolink=#{photolink},
+		company=#{company},
+		title=#{title},
+		email=#{email},
+		phone=#{phone},
+		mobile=#{mobile},
+		address=#{address},
+		website=#{website},
+		fax=#{fax},
+		selected=#{selected},
+		seriesNumber=#{seriesNumber},
+		language=#{language},
+		themeType=#{themeType}
+		;
 	</insert>
-	<update id="updateNameCard" parameterType="String">
+	<update id="updateNameCard" parameterType="beans.NameCard">
 		UPDATE NameCard
 		SET
-		password=#{password} WHERE id=#{id}
+		name=#{name},
+		photolink=#{photolink},
+		company=#{company},
+		title=#{title},
+		email=#{email},
+		phone=#{phone},
+		mobile=#{mobile},
+		address=#{address},
+		website=#{website},
+		fax=#{fax},
+		selected=#{selected},
+		seriesNumber=#{seriesNumber},
+		language=#{language},
+		themeType=#{themeType}
+		WHERE
+		id=#{id,jdbcType=INTEGER}
+		and uid=#{uid,jdbcType=INTEGER};
 	</update>
-	<delete id="deleteNameCard" parameterType="int">
+	<delete id="deleteNameCard">
 		DELETE FROM
 		NameCard
 		WHERE
 		id=#{id}
+		and uid=#{uid};
 	</delete>
+	<select id="countCards" resultType="Integer">
+		SELECT id
+		FROM NameCard
+		where
+		uid=#{uid};
+	</select>
+	<select id="getNameCards" resultType="beans.NameCard">
+		SELECT *
+		FROM NameCard
+		where
+		uid=#{uid};
+	</select>
+
 </mapper>
 

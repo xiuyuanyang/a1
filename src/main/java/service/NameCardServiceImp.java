@@ -16,34 +16,42 @@ public class NameCardServiceImp implements NameCardService{
 	@Autowired
 	private NameCardDao nameCardDao;
 
-	public NameCard getOneCard(int id) {
+	public NameCard getOneCard(int id , int uid) {
 
-		return nameCardDao.getNameCard(id);
+		return nameCardDao.getNameCard(id , uid);
 	}
 
-	public boolean addOneCard(String jsonCard) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean addOneCard(NameCard jsonCard) {
+		int r=0;
+		try{
+			r = nameCardDao.addNameCard(jsonCard);
+		}
+		catch(org.springframework.dao.DuplicateKeyException e){
+			e.printStackTrace();
+		}
+		System.out.println(r);
+		return r!=0?true:false;
 	}
 
-	public boolean deleteOneCard(int id) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean deleteOneCard(int id , int uid) {
+
+		int r = nameCardDao.deleteNameCard(id, uid);
+		System.out.println(r);		
+		return r!=0?true:false;
 	}
 
-	public boolean modifyOneCard(String jsonCard) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean modifyOneCard(NameCard jsonCard) {
+		
+		int r = nameCardDao.updateNameCard(jsonCard);
+		return r!=0?true:false;
 	}
 
-	public int countCards() {
-		// TODO Auto-generated method stub
-		return 0;
+	public List<Integer> countCards(int uid) {
+		return nameCardDao.countCards(uid);
 	}
 
-	public List<NameCard> getAllCards() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<NameCard> getAllCards(int uid) {
+		return nameCardDao.getNameCards(uid);
 	}
 
 }

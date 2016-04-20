@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.EditionDao">
+	<resultMap id="BaseResultMap" type="beans.Edition">
+		<result column="version" property="version" jdbcType="VARCHAR" />
+		<result column="url" property="url" jdbcType="VARCHAR" />
+		<result column="ifrequire" property="ifrequire" jdbcType="INTEGER" />
+	</resultMap>
+
+	<select id="getLatestEdition" resultMap="BaseResultMap" resultType="beans.Edition">
+		select * from edition where version = (select max(version) from edition);
+	</select>
+	<select id="getEditonByVersion" resultMap="BaseResultMap" resultType="beans.Edition">
+		SELECT * FROM Edition WHERE version=#{version};
+	</select>
+
+	<insert id="addEdition" parameterType="beans.Edition">
+		INSERT INTO Edition
+		(version,url,ifrequire) VALUES (#{version},#{url},#{ifrequire});
+	</insert>
+
+	<delete id="removeEdition" parameterType="beans.Edition">
+		DELETE FROM
+		Edition
+		WHERE
+		version=#{version};
+	</delete>
+
+</mapper>
+

@@ -8,23 +8,23 @@
     http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
     http://www.springframework.org/schema/aop     
-    http://www.springframework.org/schema/aop/spring-aop-4.1.xsd   
+    http://www.springframework.org/schema/aop/spring-aop-4.2.xsd   
     http://www.springframework.org/schema/tx
     http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
     http://www.springframework.org/schema/context
-    http://www.springframework.org/schema/context/spring-context-3.2.xsd
+    http://www.springframework.org/schema/context/spring-context-4.2.xsd
     http://www.springframework.org/schema/mvc  
     http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd">
 
-
-	<context:annotation-config />
 	<mvc:annotation-driven />
+	<context:annotation-config />
 	<!--启用自动扫描 -->
 	<context:component-scan base-package="com" />
 	<context:component-scan base-package="controller" />
 	<context:component-scan base-package="service" />
 	<context:component-scan base-package="dao" />
-	
+
+	<aop:aspectj-autoproxy />
 	<!-- 该 BeanPostProcessor 将自动对标注 @Autowired 的 Bean 进行注入 -->
 	<bean
 		class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
@@ -38,16 +38,16 @@
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
 		<!-- 不能放在dao层，否则 找不到 -->
-		<property name="mapperLocations" value="classpath:mapping/*.xml" />		
+		<property name="mapperLocations" value="classpath:mapping/*.xml" />
 	</bean>
-	
+
 	<!-- 配置扫描器 -->
-    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <!-- 扫描me.gacl.dao这个包以及它的子包下的所有映射接口类 -->
-        <property name="basePackage" value="dao" />
-        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
-    </bean>
-	
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 扫描me.gacl.dao这个包以及它的子包下的所有映射接口类 -->
+		<property name="basePackage" value="dao" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+	</bean>
+
 	<bean id="transactionManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource" />

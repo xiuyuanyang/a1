@@ -6,16 +6,16 @@ import beans.NameCard;
 
 public interface NameCardDao {
 
-	NameCard getNameCard(int id);
+	NameCard getNameCard(int id, int uid);
 
-	boolean addNameCard(String jsonCard);
+	int addNameCard(NameCard jsonCard);
 
-	boolean deleteNameCard(int id);
+	int deleteNameCard(int id , int uid);
 
-	boolean updateNameCard(String jsonCard);
+	int updateNameCard(NameCard jsonCard);
 
-	int countCards();
+	List<Integer> countCards(int uid);
 
-	List<NameCard> getNameCards();
+	List<NameCard> getNameCards(int uid);
 
 }

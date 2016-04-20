@@ -1,0 +1,7 @@
+eclipse.preferences.version=1
+encoding//src/main/java/controller/CardController.java=UTF-8
+encoding//src/main/java/controller/LoginController.java=UTF-8
+encoding//src/main/java/utils/IdGen.java=UTF-8
+encoding//src/main/java/utils/MD5.java=UTF-8
+encoding//src/main/java/utils/RedisUtil.java=UTF-8
+encoding//src/test/java/a1/TestClient.java=UTF-8

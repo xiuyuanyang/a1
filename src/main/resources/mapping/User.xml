@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.UserDao">
+	<resultMap id="BaseResultMap" type="beans.User">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="username" property="username" jdbcType="VARCHAR" />
+		<result column="mobile" property="mobile" jdbcType="VARCHAR" />
+		<result column="password" property="password" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="findUserById" resultMap="BaseResultMap" resultType="beans.User">
+		SELECT *
+		FROM User WHERE id=#{id};
+	</select>
+	<select id="findUserByName" resultMap="BaseResultMap" resultType="beans.User">
+		SELECT *
+		FROM User WHERE username=#{username};
+	</select>
+	<select id="findUserByMobile" resultMap="BaseResultMap" resultType="beans.User">
+		SELECT *
+		FROM User WHERE mobile=#{mobile};
+	</select>
+	<select id="findUserByMobileAndPassword" resultMap="BaseResultMap" resultType="beans.User">
+		SELECT *
+		FROM User WHERE mobile=#{mobile} and password=#{password};
+	</select>
+	<insert id="addUser" parameterType="beans.User">
+		INSERT INTO User
+		(id,username,mobile,password)VALUES
+		(#{id},#{username},#{mobile},#{password});
+	</insert>
+	<update id="updateUser" parameterType="beans.User">
+		UPDATE User
+		SET
+		name=#{name},
+		mobile=#{mobile},
+		password=#{password}
+		WHERE
+		id=#{id,jdbcType=INTEGER};
+	</update>
+	<delete id="deleteUser">
+		DELETE FROM
+		User
+		WHERE
+		id=#{id};
+	</delete>
+	<select id="countUsers" resultType="int">
+		SELECT count(*)
+		FROM User;
+	</select>
+	<select id="findAllUsers" resultType="beans.User">
+		SELECT *
+		FROM User;
+	</select>
+
+</mapper>
+
