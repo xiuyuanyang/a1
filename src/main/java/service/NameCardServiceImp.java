@@ -16,7 +16,7 @@ public class NameCardServiceImp implements NameCardService{
 	@Autowired
 	private NameCardDao nameCardDao;
 
-	public NameCard getOneCard(int id , int uid) {
+	public NameCard getOneCard(String id , int uid) {
 
 		return nameCardDao.getNameCard(id , uid);
 	}
@@ -43,6 +43,7 @@ public class NameCardServiceImp implements NameCardService{
 	public boolean modifyOneCard(NameCard jsonCard) {
 		
 		int r = nameCardDao.updateNameCard(jsonCard);
+		System.out.println(r);	
 		return r!=0?true:false;
 	}
 
@@ -54,4 +55,12 @@ public class NameCardServiceImp implements NameCardService{
 		return nameCardDao.getNameCards(uid);
 	}
 
+	@Override
+	public boolean deleteAllCard(int uid) {
+		int r = nameCardDao.deleteAllCard(uid);
+		System.out.println(r);		
+		return r!=0?true:false;
+	}
+
+	
 }

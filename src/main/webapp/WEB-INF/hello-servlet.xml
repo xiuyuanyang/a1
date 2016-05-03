@@ -6,15 +6,15 @@
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="
     http://www.springframework.org/schema/beans
-    http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+    http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
     http://www.springframework.org/schema/aop     
     http://www.springframework.org/schema/aop/spring-aop-4.2.xsd   
     http://www.springframework.org/schema/tx
-    http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+    http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
     http://www.springframework.org/schema/context
     http://www.springframework.org/schema/context/spring-context-4.2.xsd
     http://www.springframework.org/schema/mvc  
-    http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd">
+    http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd">
 
 	<mvc:annotation-driven />
 	<context:annotation-config />
@@ -25,7 +25,7 @@
 	<context:component-scan base-package="dao" />
 
 	<aop:aspectj-autoproxy />
-	
+
 	<!-- 该 BeanPostProcessor 将自动对标注 @Autowired 的 Bean 进行注入 -->
 	<bean
 		class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
@@ -57,9 +57,10 @@
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
 		destroy-method="close">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
-		<property name="url" value="jdbc:mysql://localhost:3306/mydb1" />
+		<property name="url" value="jdbc:mysql://172.17.17.125:3306/mydb1" />
 		<property name="username" value="xyang" />
 		<property name="password" value="Hengtian@019" />
 	</bean>
+
 
 </beans>

@@ -11,12 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import beans.ResultBean;
 import beans.User;
+import param.LoginParam;
 import service.LoginService;
 import utils.Global;
 import utils.IOUtil;
@@ -35,32 +37,23 @@ public class LoginController {
 	@Autowired
 	private LoginService loginService;
 
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	@RequestMapping(value = "/login", method = RequestMethod.POST , consumes={"application/x-www-form-urlencoded","application/json"})
 	@ResponseBody
-	public Object login(HttpServletRequest req) {
+	public Object login(@RequestBody LoginParam lp , HttpServletRequest req) {
 
-		String token = req.getParameter("token");
+		String contenttype = req.getHeader("content-type");
+		String token, mobile , password ;
 		ResultBean rb = new ResultBean();
-		Map<String, String> map = new HashMap<String, String>();
-		String userid;
-		if (token != null) {
-			token = token.trim();
-			userid = RedisUtil.get(token);
-			logger.info("token != null and get userid = "+ userid);
-			if (userid != null) {
-				RedisUtil.setex(token, Integer.parseInt(tokenExpiresIn), userid);
-				rb.setCode(1);
-				rb.setMessage("login success");
-				map.put("userid", userid);
-				map.put("token", token);
-				rb.setData(map);
-				return rb;
-			}
+		
+		if(contenttype.equalsIgnoreCase("application/json")) {
+			mobile = lp.getMobile();
+			password = lp.getPassword();
+		} else {
+			mobile = req.getParameter("mobile");
+			password = req.getParameter("password");
 		}
-
-		// String username = req.getParameter("username").trim();
-		String mobile = req.getParameter("mobile");
-		String password = req.getParameter("password");
+		
+		Map<String, String> map = new HashMap<String, String>();
 		password = MD5.getMD5Code(password);
 
 		if (StringUtils.isEmpty(password) | StringUtils.isEmpty(mobile)) {

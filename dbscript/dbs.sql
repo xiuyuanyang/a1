@@ -39,19 +39,22 @@ alter table namecard add phone varchar(50) ;
 alter table namecard drop phone1;
 alter table namecard drop phone2;
 alter table namecard drop phone3;
+alter table namecard modify id int(16) auto_increment primary key;
 
-create table edition (
-version varchar(50) not null unique,
-ifrequire TINYINT default 0 
-);
-alter table edition add url varchar(50);
-insert into edition (version , ifrequire) values ('0.0.1' ,0 );
-insert into edition (version , ifrequire) values ('0.0.2' ,1 );
-insert into edition (version , ifrequire) values ('0.0.3' ,0 );
-update edition set url = 'www.163.com';
-commit;
+alter table namecard drop  primary key;
+alter table namecard drop id;
+alter table namecard add id varchar(64) primary key;
+alter table namecard drop photoLink;
+alter table namecard add photolink varchar(100);
+alter table namecard modify address varchar(200);
 
-create table photo (
-id int(16) auto_increment primary key,
-img longblob
+create table feedback (
+uid int(16),
+feed varchar(100),
+updt timestamp
 );
+
+
+
+
+

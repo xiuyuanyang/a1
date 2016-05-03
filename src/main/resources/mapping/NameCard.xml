@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="dao.NameCardDao">
 	<resultMap id="BaseResultMap" type="beans.NameCard">
-		<id column="id" property="id" jdbcType="INTEGER" />
+		<id column="id" property="id" jdbcType="VARCHAR" />
 		<result column="uid" property="uid" jdbcType="INTEGER" />
 		<result column="name" property="name" jdbcType="VARCHAR" />
 		<result column="photolink" property="photolink" jdbcType="VARCHAR" />
@@ -29,22 +29,6 @@
 		(id,uid,name,photolink,company,title,email,phone,mobile,address,website,fax,selected,seriesNumber,language,themeType)
 		VALUES
 		(#{id},#{uid},#{name},#{photolink},#{company},#{title},#{email},#{phone},#{mobile},#{address},#{website},#{fax},#{selected},#{seriesNumber},#{language},#{themeType})
-		ON DUPLICATE KEY
-		UPDATE
-		name=#{name},
-		photolink=#{photolink},
-		company=#{company},
-		title=#{title},
-		email=#{email},
-		phone=#{phone},
-		mobile=#{mobile},
-		address=#{address},
-		website=#{website},
-		fax=#{fax},
-		selected=#{selected},
-		seriesNumber=#{seriesNumber},
-		language=#{language},
-		themeType=#{themeType}
 		;
 	</insert>
 	<update id="updateNameCard" parameterType="beans.NameCard">
@@ -63,19 +47,18 @@
 		selected=#{selected},
 		seriesNumber=#{seriesNumber},
 		language=#{language},
-		themeType=#{themeType}
+		themeType=#{themeType},
+		uid=#{uid}
 		WHERE
-		id=#{id,jdbcType=INTEGER}
-		and uid=#{uid,jdbcType=INTEGER};
+		id=#{id};
 	</update>
-	<delete id="deleteNameCard">
+	<delete id="deleteAllCard" parameterType="INTEGER">
 		DELETE FROM
 		NameCard
 		WHERE
-		id=#{id}
-		and uid=#{uid};
+		uid=#{uid};
 	</delete>
-	<select id="countCards" resultType="Integer">
+	<select id="countCards" resultType="String">
 		SELECT id
 		FROM NameCard
 		where

@@ -1,19 +1,22 @@
 package controller;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +26,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import beans.NameCard;
 import beans.ResultBean;
+import param.AddCardParam;
+import param.CountParam;
+import param.GetCardParam;
+import param.SetPhotoParam;
+import param.SetPhotosParam;
+import param.SetPhotosParams;
 import service.NameCardService;
 import utils.Global;
+import utils.IOUtil;
+import utils.IdGen;
 import utils.MessageConstants;
 import utils.RedisUtil;
 
@@ -36,34 +49,39 @@ public class CardController {
 
 	private Logger logger = LoggerFactory.getLogger(CardController.class);
 	private static final String tokenExpiresIn = Global.getConfig("token_expires_in");
-	
+	private static final String photoFolder = Global.getConfig("photo_folder");
+
 	@Autowired
 	ServletContext servletContext;
 
 	@Autowired
 	private NameCardService nameCardService;
 
-	@RequestMapping(value ="/get", method = RequestMethod.POST)
+	@RequestMapping(value = "/get", method = RequestMethod.POST)
 	@ResponseBody
-	public Object getCard(HttpServletRequest req, HttpServletResponse res) {
+	public Object getCard(@RequestBody GetCardParam cp) {
 
-		String token = req.getParameter("token");
-		String userid ;
+		String token = cp.getToken();
+		String userid;
 		ResultBean rb = new ResultBean();
 		if (token != null) {
 			token = token.trim();
 			userid = RedisUtil.get(token);
-			logger.info("token != null and get userid = "+ userid);
+			logger.info("token != null and get userid = " + userid);
 			if (userid != null) {
 				RedisUtil.setex(token, Integer.parseInt(tokenExpiresIn), userid);
+			} else {
+				rb.setCode(0);
+				rb.setMessage("token expired");
+				return rb;
 			}
 		} else {
 			rb.setCode(0);
-			rb.setMessage("upload without token");
+			rb.setMessage("download without token");
 			return rb;
 		}
-		
-		int id = Integer.parseInt(req.getParameter("id"));
+
+		String id = cp.getId();
 		int uid = Integer.parseInt(userid);
 		NameCard nc = nameCardService.getOneCard(id, uid);
 
@@ -81,17 +99,24 @@ public class CardController {
 
 	@RequestMapping(value = "/put", method = RequestMethod.POST)
 	@ResponseBody
-	public Object addCard(HttpServletRequest req, HttpServletResponse res, @RequestBody NameCard nc) {
+	public Object addCard(@RequestBody AddCardParam acp) {
 
-		String token = req.getParameter("token");
-		String userid ;
+		String token;
+		token = acp.getToken();
+
+		String userid;
+		String uuid;
 		ResultBean rb = new ResultBean();
 		if (token != null) {
 			token = token.trim();
 			userid = RedisUtil.get(token);
-			logger.info("token != null and get userid = "+ userid);
+			logger.info("token != null and get userid = " + userid);
 			if (userid != null) {
 				RedisUtil.setex(token, Integer.parseInt(tokenExpiresIn), userid);
+			} else {
+				rb.setCode(0);
+				rb.setMessage("token expired");
+				return rb;
 			}
 		} else {
 			rb.setCode(0);
@@ -99,68 +124,161 @@ public class CardController {
 			return rb;
 		}
 
-		nc.setUid(Integer.parseInt(userid));
+		String id = acp.getId();
+		String name = acp.getName();
+		String photolink = acp.getPhotolink();
+		String company = acp.getCompany();
+		String title = acp.getTitle();
+		String email = acp.getEmail();
+		String phone = acp.getPhone();
+		String fax = acp.getFax();
+		String mobile = acp.getMobile();
+		String address = acp.getAddress();
+		String website = acp.getWebsite();
+		String seriesNumber = acp.getSeriesNumber();
+		String themeType = acp.getThemeType();
+		String language = acp.getLanguage();
+
+		NameCard nc = new NameCard();
+		Map<String, String> map = new HashMap<String, String>();
+		nc.setUid(Integer.parseInt(userid.trim()));
+		boolean updateFlag = false;
 		
-		if (nameCardService.addOneCard(nc)) {
-			rb.setMessage("upload success");
-			rb.setCode(MessageConstants.success.getValue());
+		if (!StringUtils.isEmpty(id)) {
+			System.out.println("id = "+id);
+			System.out.println("userid = "+userid);
+			nc.setId(id.trim());
+			uuid = id.trim();
+			map.put("isNotUpdate", "0");
+			updateFlag = true;
 		} else {
-			rb.setMessage("upload fail");
-			rb.setCode(MessageConstants.error.getValue());
+			uuid = IdGen.uuid();
+			nc.setId(uuid);
+			map.put("isNotUpdate", "1");
 		}
+		
+		if (!StringUtils.isEmpty(name)) {
+			nc.setName(name.trim());
+		}
+		if (!StringUtils.isEmpty(photolink)) {
+			nc.setPhotolink(photolink.trim());
+		}
+		if (!StringUtils.isEmpty(company)) {
+			nc.setCompany(company.trim());
+		}
+		if (!StringUtils.isEmpty(title)) {
+			nc.setTitle(title.trim());
+		}
+		if (!StringUtils.isEmpty(email)) {
+			nc.setEmail(email.trim());
+		}
+		if (!StringUtils.isEmpty(phone)) {
+			nc.setPhone(phone.trim());
+		}
+		if (!StringUtils.isEmpty(fax)) {
+			nc.setFax(fax.trim());
+		}
+		if (!StringUtils.isEmpty(mobile)) {
+			nc.setMobile(mobile.trim());
+		}
+		if (!StringUtils.isEmpty(address)) {
+			nc.setAddress(address.trim());
+		}
+		if (!StringUtils.isEmpty(website)) {
+			nc.setWebsite(website.trim());
+		}
+		if (!StringUtils.isEmpty(seriesNumber)) {
+			nc.setSeriesNumber(Integer.parseInt(seriesNumber.trim()));
+		}
+		if (!StringUtils.isEmpty(themeType)) {
+			nc.setThemeType(Integer.parseInt(themeType.trim()));
+		}
+		if (!StringUtils.isEmpty(language)) {
+			nc.setLanguage(Integer.parseInt(language.trim()));
+		}
+
+		if (updateFlag) {
+			if (nameCardService.modifyOneCard(nc)) {
+				rb.setMessage("upload update success");
+				map.put("id", uuid);
+				rb.setData(map);
+				rb.setCode(MessageConstants.success.getValue());
+			} else {
+				rb.setMessage("upload update fail");
+				rb.setCode(MessageConstants.error.getValue());
+			}
+			
+		} else {
+			if (nameCardService.addOneCard(nc)) {
+				rb.setMessage("upload insert success");
+				map.put("id", uuid);
+				rb.setData(map);
+				rb.setCode(MessageConstants.success.getValue());
+			} else {
+				rb.setMessage("upload insert fail");
+				rb.setCode(MessageConstants.error.getValue());
+			}
+		}
+		
 		return rb;
 
 	}
 
-	@RequestMapping("/modify")
+	@RequestMapping(value = "/remove", method = RequestMethod.POST)
 	@ResponseBody
-	public Object updateNameCard(HttpServletRequest req, HttpServletResponse res) {
-		// PrintWriter out = null;
-		// NameCard nc = nameCardService.getOneCard(1 , 1);
-		// boolean r = nameCardService.modifyOneCard(nc);
-		// try {
-		// out = res.getWriter();
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
-		// out.write(r + "modify ");
-		// out.flush();
-		// out.close();
-		// System.out.println(r);
-		// return "index";
-		return null;
-	}
-
-	@RequestMapping(value ="/remove", method = RequestMethod.POST)
-	@ResponseBody
-	public String removeCard(HttpServletRequest req, HttpServletResponse res) {
-		PrintWriter out = null;
-		boolean r = nameCardService.deleteOneCard(2, 1);
-		try {
-			out = res.getWriter();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		out.write(r + "remove ");
-		out.flush();
-		out.close();
-		System.out.println(r);
-		return "index";
-	}
-
-	@RequestMapping(value ="/count", method = RequestMethod.POST)
-	@ResponseBody
-	public Object countCards(HttpServletRequest req, HttpServletResponse res) {
+	public Object removeCard(@RequestBody GetCardParam cp) {
 		
+		String token = cp.getToken();
+		ResultBean rb = new ResultBean();
+		String userid;
+		if (token != null) {
+			token = token.trim();
+			userid = RedisUtil.get(token);
+			logger.info("token != null and get userid = " + userid);
+			if (userid != null) {
+				RedisUtil.setex(token, Integer.parseInt(tokenExpiresIn), userid);
+			} else {
+				rb.setCode(0);
+				rb.setMessage("token expired");
+				return rb;
+			}
+		} else {
+			rb.setCode(0);
+			rb.setMessage("upload without token");
+			return rb;
+		}
+System.out.println(userid);
+		boolean r = nameCardService.deleteAllCard(Integer.parseInt(userid));
+	
+		if (r) {
+			rb.setCode(1);
+			rb.setMessage("remove success");
+		}
+
+		return rb;
+	}
+
+	@RequestMapping(value = "/count", method = RequestMethod.POST)
+	@ResponseBody
+	public Object countCards(HttpServletRequest req, @RequestBody CountParam cp) {
+
 		String token = req.getParameter("token");
-		String userid ;
+		String userid;
+		if (token == null) {
+			token = cp.getToken();
+		}
+
 		ResultBean rb = new ResultBean();
 		if (token != null) {
 			token = token.trim();
 			userid = RedisUtil.get(token);
-			logger.info("token != null and get userid = "+ userid);
+			logger.info("token != null and get userid = " + userid);
 			if (userid != null) {
 				RedisUtil.setex(token, Integer.parseInt(tokenExpiresIn), userid);
+			} else {
+				rb.setCode(0);
+				rb.setMessage("token expired");
+				return rb;
 			}
 		} else {
 			rb.setCode(0);
@@ -180,17 +298,36 @@ public class CardController {
 			rb.setMessage("count cards fail");
 		}
 
-		System.out.println(r+"");
+		System.out.println(r + "");
 		return rb;
 	}
 
-	@RequestMapping(value ="/all", method = RequestMethod.POST)
+	@RequestMapping(value = "/all", method = RequestMethod.POST)
 	@ResponseBody
 	public Object getAllCards(HttpServletRequest req, HttpServletResponse res) {
 
-		List<NameCard> an = nameCardService.getAllCards(1);
-
+		String token = req.getParameter("token");
+		String userid;
 		ResultBean rb = new ResultBean();
+		if (token != null) {
+			token = token.trim();
+			userid = RedisUtil.get(token);
+			logger.info("token != null and get userid = " + userid);
+			if (userid != null) {
+				RedisUtil.setex(token, Integer.parseInt(tokenExpiresIn), userid);
+			} else {
+				rb.setCode(0);
+				rb.setMessage("token expired");
+				return rb;
+			}
+		} else {
+			rb.setCode(0);
+			rb.setMessage("upload without token");
+			return rb;
+		}
+
+		List<NameCard> an = nameCardService.getAllCards(Integer.parseInt(userid));
+
 		if (!an.isEmpty()) {
 			rb.setCode(MessageConstants.success.getValue());
 			rb.setData(an);
@@ -201,72 +338,110 @@ public class CardController {
 
 		}
 		return rb;
-
 	}
 
-	@RequestMapping("/setPhoto")
+	@RequestMapping(value = "/setPhoto", method = RequestMethod.POST)
 	@ResponseBody
-	public Object setPhoto(HttpServletRequest req, HttpServletResponse res) {
+	public Object setPhoto(@RequestBody SetPhotoParam spp, HttpServletRequest req) {
 
 		ResultBean rb = new ResultBean();
+		String photo = spp.getPhoto();
 
-		String savePath = servletContext.getRealPath("/WEB-INF/upload");
-
-		File file = new File(savePath);
-		if (!file.exists() && !file.isDirectory()) {
-			System.out.println(savePath + " not there ");
-			file.mkdir();
-		}
-
-		String message = "";
-
-		DiskFileItemFactory factory = new DiskFileItemFactory();
-
-		ServletFileUpload upload = new ServletFileUpload(factory);
-
-		upload.setHeaderEncoding("UTF-8");
-
-		if (!ServletFileUpload.isMultipartContent(req)) {
+		if (StringUtils.isEmpty(photo)) {
+			rb.setCode(0);
+			rb.setMessage("upload photo fail , photo can not be empty");
 			return rb;
 		}
+		String filePath = servletContext.getRealPath(photoFolder);
+		String filename = IdGen.uuid() + ".png";
+		String fileUrl;
 
-		List<FileItem> list;
+		File f = new File(filePath);
+		if (!f.exists()) {
+			f.mkdirs();
+		}
+		f = new File(filePath + filename);
+
 		try {
-			list = upload.parseRequest(req);
-			for (FileItem item : list) {
-				if (item.isFormField()) {
-					String name = item.getFieldName();
-					String value = item.getString("UTF-8");
-					System.out.println(name + "=" + value);
-				} else {
-					String filename = item.getName();
-					System.out.println(filename);
-					if (filename == null || filename.trim().equals("")) {
-						continue;
+			// f.createNewFile();
+			FileOutputStream out = new FileOutputStream(f);
 
-					}
+			byte[] b = Base64.decodeBase64(photo);
 
-					filename = filename.substring(filename.lastIndexOf("\\") + 1);
-					InputStream in = item.getInputStream();
-					FileOutputStream out = new FileOutputStream(savePath + "\\" + filename);
-					byte buffer[] = new byte[1024];
-					int len = 0;
-					while ((len = in.read(buffer)) > 0) {
-						out.write(buffer, 0, len);
-					}
-					in.close();
-					out.close();
-					item.delete();
-					message = "file upload success";
-				}
+			out.write(b);
+			out.close();
+
+			logger.info(req.getServerName() + ":" + req.getServerPort() + "/" + req.getServletPath());
+			System.out.println(req.getRequestURL());
+			System.out.println(servletContext.getRealPath("/"));
+			System.out.println(req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort()
+					+ req.getContextPath() + photoFolder);
+
+			fileUrl = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + req.getContextPath()
+					+ photoFolder + filename;
+
+			rb.setCode(1);
+			rb.setMessage("upload photo success");
+			rb.setData(fileUrl);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return rb;
+	}
+
+	@RequestMapping(value = "/setPhotos", method = RequestMethod.POST)
+	@ResponseBody
+	public Object setPhoto(@RequestBody SetPhotosParams sp, HttpServletRequest req) {
+
+		ResultBean rb = new ResultBean();
+			
+//		ObjectMapper objectMapper;
+		try {
+//			String str = IOUtil.getBodyString(req.getReader());
+			List<SetPhotosParam> arr = sp.getPhoto();
+			
+			String filePath = servletContext.getRealPath(photoFolder);
+
+			String filename ; 
+			String fileUrl;
+
+			File f = new File(filePath);
+			if (!f.exists()) {
+				f.mkdirs();
 			}
-		} catch (Exception e) {
+			Map<String, String> map = new HashMap<String, String>();
+			String photo;
+			FileOutputStream out;
+			
+			for (SetPhotosParam spp : arr) {
+				photo = spp.getContent();
+				filename = IdGen.uuid() + ".png";
+				f = new File(filePath + filename);
+				out = new FileOutputStream(f);
+				byte[] b = Base64.decodeBase64(photo);
+				out.write(b);
+				out.close();
+				
+				logger.info(req.getServerName() + ":" + req.getServerPort() + "/" + req.getServletPath());
+				System.out.println(req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort()
+						+ req.getContextPath() + photoFolder);
+				fileUrl = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort()
+						+ req.getContextPath() + photoFolder + filename;
+				map.put(spp.getNo(), fileUrl);
+			}
+
+			rb.setCode(1);
+			rb.setMessage("upload photo success");
+			rb.setData(map);
+
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		return rb;
 
+		return rb;
 	}
 
 }

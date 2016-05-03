@@ -6,11 +6,11 @@ import beans.NameCard;
 
 public interface NameCardService {
 	
-	NameCard getOneCard(int id , int uid);
+	NameCard getOneCard(String id , int uid);
 	
 	boolean addOneCard(NameCard jsonCard);
 	
-	boolean deleteOneCard(int id , int uid);
+	boolean deleteAllCard(int uid);
 	
 	boolean modifyOneCard(NameCard jsonCard);
 	
