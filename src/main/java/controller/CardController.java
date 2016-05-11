@@ -140,7 +140,7 @@ public class CardController {
 		String language = acp.getLanguage();
 
 		NameCard nc = new NameCard();
-		Map<String, String> map = new HashMap<String, String>();
+//		Map<String, String> map = new HashMap<String, String>();
 		nc.setUid(Integer.parseInt(userid.trim()));
 		boolean updateFlag = false;
 		
@@ -149,12 +149,12 @@ public class CardController {
 			System.out.println("userid = "+userid);
 			nc.setId(id.trim());
 			uuid = id.trim();
-			map.put("isNotUpdate", "0");
+//			map.put("isNotUpdate", "0");
 			updateFlag = true;
 		} else {
 			uuid = IdGen.uuid();
 			nc.setId(uuid);
-			map.put("isNotUpdate", "1");
+//			map.put("isNotUpdate", "1");
 		}
 		
 		if (!StringUtils.isEmpty(name)) {
@@ -197,21 +197,60 @@ public class CardController {
 			nc.setLanguage(Integer.parseInt(language.trim()));
 		}
 
-		if (updateFlag) {
+//		if (updateFlag) {
+//			if (nameCardService.modifyOneCard(nc)) {
+//				rb.setMessage("upload update success");
+//				map.put("id", uuid);
+//				rb.setData(map);
+//				rb.setCode(MessageConstants.success.getValue());
+//			} else {				
+//				rb.setMessage("upload update fail");
+//				rb.setCode(MessageConstants.error.getValue());
+//			}
+//			
+//		} else {
+//			if (nameCardService.addOneCard(nc)) {
+//				rb.setMessage("upload insert success");
+//				map.put("id", uuid);
+//				rb.setData(map);
+//				rb.setCode(MessageConstants.success.getValue());
+//			} else {
+//				rb.setMessage("upload insert fail");
+//				rb.setCode(MessageConstants.error.getValue());
+//			}
+//		}
+		uploadCard(nc,rb,updateFlag);
+		return rb;
+
+	}
+
+	private void uploadCard(NameCard nc , ResultBean rb , boolean isUpdate){
+		Map<String, String> map = new HashMap<String, String>();
+		if (isUpdate) {
 			if (nameCardService.modifyOneCard(nc)) {
 				rb.setMessage("upload update success");
-				map.put("id", uuid);
+				map.put("id", nc.getId());
+				map.put("isNotUpdate", "0");
 				rb.setData(map);
 				rb.setCode(MessageConstants.success.getValue());
 			} else {
-				rb.setMessage("upload update fail");
-				rb.setCode(MessageConstants.error.getValue());
+				if(nameCardService.addOneCard(nc)){
+					rb.setMessage("meant to update but in fact insert success");
+					map.put("id", nc.getId());
+					map.put("isNotUpdate", "1");
+					rb.setData(map);
+					rb.setCode(MessageConstants.success.getValue());
+				} else {
+					rb.setMessage("upload update fail");
+					rb.setCode(MessageConstants.error.getValue());
+				}	
 			}
 			
 		} else {
 			if (nameCardService.addOneCard(nc)) {
 				rb.setMessage("upload insert success");
-				map.put("id", uuid);
+				map.put("id", nc.getId());
+				map.put("isNotUpdate", "1");
 				rb.setData(map);
 				rb.setCode(MessageConstants.success.getValue());
 			} else {
@@ -220,10 +259,8 @@ public class CardController {
 			}
 		}
 		
-		return rb;
-
 	}
-
+	
 	@RequestMapping(value = "/remove", method = RequestMethod.POST)
 	@ResponseBody
 	public Object removeCard(@RequestBody GetCardParam cp) {

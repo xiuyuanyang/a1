@@ -7,7 +7,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.NetworkInterface;
+import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.imageio.stream.FileImageInputStream;
@@ -25,14 +29,46 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.servlet.FrameworkServlet;
+import org.springframework.web.servlet.HandlerAdapter;
+import org.springframework.web.servlet.HandlerExecutionChain;
+import org.springframework.web.servlet.HttpServletBean;
 
+import beans.User;
+import dao.UserDao;
 import param.SetPhotosParam;
 
 public class TestClient {
 	
-	public static void testVerison() {
+	public static void testlogout() {
 
-		String url2 = "http://mynamecard.hengtiansoft.com/a1-0.0.1-SNAPSHOT/info/version/";
+		String url2 = "http://mynamecard.hengtiansoft.com/a1-0.0.1-SNAPSHOT/mobile/logout";
+		String body = "{\"token\":\"d3c84c24a82d4beeaae6a11364bd0530\"}";
+		
+		try {
+			CloseableHttpClient httpclient = HttpClients.createDefault();
+
+			HttpPost request = new HttpPost(url2);			
+			StringEntity params2 = new StringEntity(body);
+			
+			request.addHeader("content-type", "application/json");
+			request.setEntity(params2);
+			HttpResponse response = httpclient.execute(request);
+
+			System.out.println(response.getStatusLine().getStatusCode());
+			String strResult = EntityUtils.toString(response.getEntity());
+			System.out.println(strResult);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void testverison() {
+
+		String url2 = "http://mynamecard.hengtiansoft.com/a1-0.0.1-SNAPSHOT/info/getAppID/asdfad";
 		try {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
 
@@ -85,7 +121,7 @@ public class TestClient {
 	
 	public static void testlogin() {
 
-		String url2 = "http://mynamecard.hengtiansoft.com:8080/a1-0.0.1-SNAPSHOT/mobile/login/";
+		String url2 = "http://mynamecard.hengtiansoft.com/a1-0.0.1-SNAPSHOT/mobile/login/";
 		
 		
 		String body = "{\"mobile\":\"13588775565\",\"password\":\"123456\"}";
@@ -213,7 +249,7 @@ public class TestClient {
 
 	public static void put() {
 
-		String url2 = "http://172.17.17.125:8080/a1-0.0.1-SNAPSHOT/card/put/";
+		String url2 = "http://mynamecard.hengtiansoft.com/a1-0.0.1-SNAPSHOT/card/put/";
 //		List<NameValuePair> params = new ArrayList<NameValuePair>();
 //		params.add(new BasicNameValuePair("token", "b46bc1d5cfd246b2bb84b75982e617b7"));
 //
@@ -236,7 +272,7 @@ public class TestClient {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
 
 			HttpPost request = new HttpPost(url2);
-			String body = "{\"id\":\"\",   \"seriesNumber\" : 3,\"selected\" : 1,\"phone\" : \"123456\",\"mobile\" : \"789\",\"company\" : \"\",\"title\" : \"\",\"fax\" : \"\",\"address\" : \"USATiburonCA1747 Steuart Street\",\"themeType\" : 0,\"language\" : 0,\"token\" : \"b9831b2ed7cf46de920745e28d5d3c81\",\"website\" : \"\",\"photolink\" : \"http://172.17.17.125:8080/a1-0.0.1-SNAPSHOT/res/photo/005d3505b6aa472bbfa1caea434ba553.png\",\"name\" : \"David Taylor\",\"email\" : \"\"\n}";
+			String body = "{\"id\":\"\",   \"seriesNumber\" : 3,\"selected\" : 1,\"phone\" : \"123456\",\"mobile\" : \"789\",\"company\" : \"\",\"title\" : \"\",\"fax\" : \"\",\"address\" : \"USATiburonCA1747 Steuart Street\",\"themeType\" : 0,\"language\" : 0,\"token\" : \"713e82051ba547dfa119c6853970d68e\",\"website\" : \"\",\"photolink\" : \"http://172.17.17.125:8080/a1-0.0.1-SNAPSHOT/res/photo/005d3505b6aa472bbfa1caea434ba553.png\",\"name\" : \"David Taylor\",\"email\" : \"\"\n}";
 //			StringEntity params2 = new StringEntity(body);
 			
 			
@@ -259,14 +295,14 @@ public class TestClient {
 	
 	public static void get() {
 
-		String url2 = "http://172.17.17.125:8080/a1-0.0.1-SNAPSHOT/card/get/";
+		String url2 = "http://mynamecard.hengtiansoft.com/a1-0.0.1-SNAPSHOT/card/get/";
 		
 		
 		try {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
 
 			HttpPost request = new HttpPost(url2);
-			String body = "{\"id\" : \"4a65933ca89749738fcbaaa606188bb3\",\"token\" : \"b9831b2ed7cf46de920745e28d5d3c81\"\n}";
+			String body = "{\"id\" : \"db33cc6869b340b7886f205348daa7a6\",\"token\" : \"bb2f8158a09e4dfabfcba7b646fd1a28\"\n}";
 //			StringEntity params2 = new StringEntity(body);
 			
 			
@@ -289,7 +325,7 @@ public class TestClient {
 	
 	public static void setPhtoto() {
 
-		String url2 = "http://172.17.17.125:8080/a1-0.0.1-SNAPSHOT/card/setPhoto/";
+		String url2 = "http://mynamecard.hengtiansoft.com/a1-0.0.1-SNAPSHOT/card/setPhoto/";
 		File f2 = new File("C:/Users/xiuyuanyang/Desktop/namecard.png");
 		
 		try {
@@ -335,7 +371,7 @@ public class TestClient {
 	
 	public static void setPhtotos() {
 
-		String url2 = "http://172.17.17.125:8080/a1-0.0.1-SNAPSHOT/card/setPhotos/";
+		String url2 = "http://mynamecard.hengtiansoft.com/a1-0.0.1-SNAPSHOT/card/setPhotos/";
 		File f2 = new File("C:/Users/xiuyuanyang/Desktop/namecard.png");
 		
 		try {
@@ -379,15 +415,32 @@ public class TestClient {
 		}
 	}
 	
-	public static void jsontest() {
+	public static void jsontest() throws SocketException {
 
 		String encodedString = "hehehe";
 		String body = "{\"photo\": [{\"no\":\"1\",\"content\" : \""+  encodedString + "\"} ,{\"no\":\"2\",\"content\" : \""+  encodedString + "\"} ] }";			
 		
-		
+		 java.lang.annotation.Annotation a;
 		JSONObject o = new JSONObject(body);
-		
+		Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
 		JSONArray ja = o.getJSONArray("photo");
+		Socket sk = new Socket();
+		
+		System.out.println(new Enumeration(){
+
+			@Override
+			public boolean hasMoreElements() {
+				// TODO Auto-generated method stub
+				return false;
+			}
+
+			@Override
+			public Object nextElement() {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+		}.getClass().getName());
 		
 //		ja.
 		
@@ -407,90 +460,16 @@ public class TestClient {
 		
 	}
 	
-	public static void main(String[] args) throws IOException  {
+	public static void main(String[] args) throws IOException, ClassNotFoundException  {
 
-		// String url = "http://172.17.17.125:8080/a1-0.0.1-SNAPSHOT/card/get/";
-		// try {
-		// CloseableHttpClient httpclient = HttpClients.createDefault();
-		// //发送get请求
-		// HttpGet request = new HttpGet(url);
-		// HttpResponse response = httpclient.execute(request);
-		//
-		// System.out.println(response.getStatusLine().getStatusCode());
-		// String strResult = EntityUtils.toString(response.getEntity());
-		// System.out.println(strResult);
-		//
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
-
-//		SecureRandom random = new SecureRandom();
-//		int i = random.nextInt(1000000);
-//		int b = (int) (Math.random()*1000000);
-//		int a = (int)(random.nextInt()*9+1)*1000000;
+//	    TestClient.put();
 //		
-//		for (int g =0 ; g < 10 ; g++)
-//		System.out.println(IdGen.randomInt(6));
-//	   TestClient.testlogin();
-	//    TestClient.put();
-	//    TestClient.get();
-//	    TestClient.jsontest();
-	    TestClient.testVerison();
-//	TestClient.setPhtotos();
-//		TestClient.testregister();
-//             System.out.println(IdGen.uuid());
+		TestClient.testverison();
+//		TestClient.testVerison();
+//		System.out.println(int[][][].class.toString());
+//		System.out.println(a.getClass());
 		
-//		File f = new File("D:/apache-tomcat-8.0.33/webapps/a1-0.0.1-SNAPSHOT/resource/photo/");
-//		
-//		ByteArrayOutputStream  bo = new ByteArrayOutputStream(); 
-//		
-//		
-//   try {
-//			f.mkdirs();
-//			f = new File("D:/apache-tomcat-8.0.33/webapps/a1-0.0.1-SNAPSHOT/resource/photo/b.txt");
-//			f.createNewFile();
-//		
-//		
-//		File f2 = new File("C:/Users/xiuyuanyang/Desktop/namecard.png");
-//		
-//		byte[] data = null;
-//	    FileImageInputStream input = null;
-//	   
-//	      input = new FileImageInputStream(f2);
-//	      ByteArrayOutputStream output = new ByteArrayOutputStream();
-//	      byte[] buf = new byte[1024];
-//	      int numBytesRead = 0;
-//	      while ((numBytesRead = input.read(buf)) != -1) {
-//	      output.write(buf, 0, numBytesRead);
-//	      }
-//	      
-//	      
-//	      data = output.toByteArray();
-//	      output.close();
-//		
-//		String encodedString = Base64.encodeBase64String(data);
-//	      
-//		byte[] decodedByte = Base64.decodeBase64(encodedString);
-//		
-////		FileInputStream in;
-//		FileOutputStream out;
-//		byte[] b = new byte[1024];
-//
-////			in = new FileInputStream(f2);
-////			
-////			in.
-//			out = new FileOutputStream(f);
-//			out.write(decodedByte);
-////			while(in.read(b)!=-1) {
-////				out.write(b);
-////			}
-//			
-////			in.close();
-//			out.close();
-//		} catch (FileNotFoundException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} 
-//	 
+//		System.out.println(Class.forName("java.util.AA").toString());
+
 	}
 }

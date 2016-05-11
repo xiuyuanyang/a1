@@ -47,6 +47,7 @@ alter table namecard add id varchar(64) primary key;
 alter table namecard drop photoLink;
 alter table namecard add photolink varchar(100);
 alter table namecard modify address varchar(200);
+alter table namecard modify photolink varchar(200);
 
 create table feedback (
 uid int(16),

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import beans.ResultBean;
 import beans.User;
+import param.CountParam;
 import param.LoginParam;
 import service.LoginService;
 import utils.Global;
@@ -37,22 +38,23 @@ public class LoginController {
 	@Autowired
 	private LoginService loginService;
 
-	@RequestMapping(value = "/login", method = RequestMethod.POST , consumes={"application/x-www-form-urlencoded","application/json"})
+	@RequestMapping(value = "/login", method = RequestMethod.POST, consumes = { "application/x-www-form-urlencoded",
+			"application/json" })
 	@ResponseBody
-	public Object login(@RequestBody LoginParam lp , HttpServletRequest req) {
+	public Object login(@RequestBody LoginParam lp, HttpServletRequest req) {
 
 		String contenttype = req.getHeader("content-type");
-		String token, mobile , password ;
+		String token, mobile, password;
 		ResultBean rb = new ResultBean();
-		
-		if(contenttype.equalsIgnoreCase("application/json")) {
+
+		if (contenttype.equalsIgnoreCase("application/json")) {
 			mobile = lp.getMobile();
 			password = lp.getPassword();
 		} else {
 			mobile = req.getParameter("mobile");
 			password = req.getParameter("password");
 		}
-		
+
 		Map<String, String> map = new HashMap<String, String>();
 		password = MD5.getMD5Code(password);
 
@@ -72,12 +74,20 @@ public class LoginController {
 			rb.setCode(MessageConstants.error.getValue());
 			rb.setMessage("login fail , wrong password or mobile");
 		} else {
+			// try to get current time token by mobile no. then delete this .
+			token = RedisUtil.get(mobile);
+			if (!StringUtils.isEmpty(token)) {
+				RedisUtil.del(token);
+			}
+
+			// generate new token and bind to mobile user.
 			token = IdGen.uuid();
 			rb.setCode(MessageConstants.success.getValue());
 			rb.setMessage("login success");
 			map.put("userid", u.getId() + "");
 			map.put("token", token);
 			rb.setData(map);
+			RedisUtil.setex(mobile, Integer.valueOf(tokenExpiresIn), token);
 			RedisUtil.setex(token, Integer.parseInt(tokenExpiresIn), u.getId() + "");
 		}
 		return rb;
@@ -103,7 +113,7 @@ public class LoginController {
 			password = password.trim();
 			User u = new User();
 			u.setMobile(mobile);
-			logger.info("register user and password = "+password);
+			logger.info("register user and password = " + password);
 			password = MD5.getMD5Code(password);
 			u.setPassword(password);
 			u.setUsername(username);
@@ -124,19 +134,22 @@ public class LoginController {
 
 	@RequestMapping(value = "/logout", method = RequestMethod.POST)
 	@ResponseBody
-	public Object logout(HttpServletRequest req) {
+	public Object logout(@RequestBody CountParam cp ,HttpServletRequest req) {
 		ResultBean rb = new ResultBean();
 		try {
-			String str = IOUtil.getBodyString(req.getReader());
-			JSONObject object = new JSONObject(str);
-			String token = (String) object.get("token");
+//			String str = IOUtil.getBodyString(req.getReader());
+//			JSONObject object = new JSONObject(str);
+//			String token = (String) object.get("token");
+			
+			String str = cp.getToken();
 
-			if (StringUtils.isEmpty(token)) {
-				rb.setCode(1);
-				rb.setMessage("logout success");
+			if (StringUtils.isEmpty(str)) {
+				rb.setCode(0);
+				rb.setMessage("token can not be empty");
 				return rb;
 			}
 
+			String token = str.trim();
 			RedisUtil.del(token);
 			rb.setCode(1);
 			rb.setMessage("logout success");
