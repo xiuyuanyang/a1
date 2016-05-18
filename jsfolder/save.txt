@@ -1,0 +1,28 @@
+	
+	var nx = e.pageX;
+	var ny = e.pageX;
+	var lx = Math.abs(nx-x);
+	var ly = Math.abs(ny-y);
+	var movex = ((x > ox)? (0*lx /(lx + ly)) : ((-0)*lx /(lx + ly))) ;
+	var movey = ((y > oy)? (0*ly /(lx + ly)) : ((-0)*ly /(lx + ly))) ;
+	qingli(ctx, mycanvas.width, mycanvas,height );
+	drawYuanQuan(ctx,x+movex,y+movey,50);
+	
+	
+	qiu.prototype.set=function(x,y,r){
+	this.x=x;
+	this.y=y;
+	this.r=r;
+};
+	
+	
+var game={
+	qius:[]
+};
+
+function qiu(){
+	this.x;
+	this.y;
+	this.r;
+	this.yanse;
+}

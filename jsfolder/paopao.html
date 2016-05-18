@@ -1,0 +1,81 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Demo</title>
+</head>
+<body>
+<script src="http://lib.sinaapp.com/js/jquery/1.9.1/jquery-1.9.1.min.js"></script>
+<script>
+var mycanvas = document.createElement("canvas");  
+document.body.appendChild(mycanvas);
+var ctx = mycanvas.getContext("2d");
+var x;
+var y;
+var ox;
+var oy;
+var speed=2;
+var daxiao=20;
+
+var game={
+		qius:[]
+	};
+	
+function qiu(){
+	this.x;
+	this.y;
+	this.r;
+	this.yanse;
+}
+
+qiu.prototype.set=function(x,y,r){
+	this.x=x;
+	this.y=y;
+	this.r=r;
+};
+
+$( document ).ready(function() {        
+		birth();
+        drawYuanQuan(ctx,x,y,daxiao);
+});
+
+function birth(){
+	x = Math.random()*200;
+	y = Math.random()*200;
+}
+
+function drawFangKuai(ctx,x,y ,r){
+    ctx.fillStyle = "green";
+    ctx.fillRect(x, y, x+r, y+r);
+}
+
+function drawYuanQuan(ctx,x,y,r){
+	ctx.beginPath();
+    ctx.fillStyle = "yellow";
+    ctx.arc(x, y, r, 0,360,false);
+    ctx.fill();
+}
+
+function qingli(ctx,x,y){
+	ctx.clearRect(0,0,x,y);
+}
+
+function doMouseMove(e){
+	e=e||window.event;
+	ox = x;
+	oy = y;
+	var lx = Math.abs(e.pageX-ox);
+	var ly = Math.abs(e.pageY-oy);
+	var movex = ((e.pageX > ox)? (speed*lx /(lx + ly)) : ((-speed)*lx /(lx + ly))) ;
+	var movey = ((e.pageY > oy)? (speed*ly /(lx + ly)) : ((-speed)*ly /(lx + ly))) ;
+	x = ox+movex;
+    y = oy+movey;
+
+	qingli(ctx,10000,10000);
+	drawYuanQuan(ctx,x,y,daxiao);
+}
+
+document.addEventListener("mousemove",doMouseMove , false);
+
+</script>
+</body>
+</html>
