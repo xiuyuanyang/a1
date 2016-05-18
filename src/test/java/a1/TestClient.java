@@ -68,7 +68,8 @@ public class TestClient {
 	
 	public static void testverison() {
 
-		String url2 = "http://mynamecard.hengtiansoft.com/a1-0.0.1-SNAPSHOT/info/getAppID/asdfad";
+		String url2 = "http://mynamecard.hengtiansoft.com/a1-0.0.1-SNAPSHOT/info/version";
+	//	String url2 = "http://172.17.17.125:8080/a1-0.0.1-SNAPSHOT/info/version";
 		try {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
 
@@ -160,9 +161,9 @@ public class TestClient {
 
 		String url2 = "http://172.17.17.125:8080/a1-0.0.1-SNAPSHOT/mobile/register/";
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("username", "guest"));
+		params.add(new BasicNameValuePair("username", "TingZhi"));
 		params.add(new BasicNameValuePair("password", "123456"));
-		params.add(new BasicNameValuePair("mobile", "13599882211"));
+		params.add(new BasicNameValuePair("mobile", "13575746708"));
 		try {
 			CloseableHttpClient httpclient = HttpClients.createDefault();
 
@@ -464,7 +465,7 @@ public class TestClient {
 
 //	    TestClient.put();
 //		
-		TestClient.testverison();
+		TestClient.testregister();
 //		TestClient.testVerison();
 //		System.out.println(int[][][].class.toString());
 //		System.out.println(a.getClass());
