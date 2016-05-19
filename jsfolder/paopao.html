@@ -6,36 +6,108 @@
 <body>
 <script src="http://lib.sinaapp.com/js/jquery/1.9.1/jquery-1.9.1.min.js"></script>
 <script>
-var mycanvas = document.createElement("canvas");  
+var mycanvas = document.createElement("canvas");
+mycanvas.width = window.innerWidth;
+mycanvas.height = window.innerHeight;
 document.body.appendChild(mycanvas);
 var ctx = mycanvas.getContext("2d");
 var x;
 var y;
 var ox;
 var oy;
-var speed=2;
+var initspeed=8;
 var daxiao=20;
+var mir=2;
 
 var game={
-		qius:[]
+		qius:[],
+		mi:[],
+		generate:function(colo){
+			var x = Math.random()*200;
+			var y = Math.random()*200;
+			var r = daxiao;
+			var color = colo;
+			var q = new qiu(x,y,r,color,initspeed);
+			this.qius.push(q);
+		},
+		run:function(e){
+			qingli(ctx,10000,10000);
+			for(var t in this.qius) {				
+				doMouseMove(e,this.qius[t]);
+			}
+			checkIfEat(this.qius,this.mi);
+			for(var m in this.mi) {
+				drawmi(this.mi[m]);
+			}
+		},
+		fenlie:function(){
+			//this.qius
+		},
+		sami:function(){
+			var x,y,r,color,q;
+			for(var i=0;i<10;i++){
+				x = Math.random()*window.innerWidth;
+				y = Math.random()*window.innerHeight;
+				r = mir;
+				color = "black";
+				q = new qiu(x,y,r,color);
+				this.mi.push(q);
+			}
+		},
 	};
-	
-function qiu(){
-	this.x;
-	this.y;
-	this.r;
-	this.yanse;
-}
 
-qiu.prototype.set=function(x,y,r){
+function drawmi(xiaomi){
+	drawYuanQuan(ctx,xiaomi.x,xiaomi.y,xiaomi.r,xiaomi.yanse);
+}
+	
+function checkIfEat(qiu,mi){
+	for(var o in qiu){
+		for (var i in mi){		
+			if(mi[i].x > (qiu[o].x-qiu[o].r) && mi[i].x < (qiu[o].x+qiu[o].r) && mi[i].y> (qiu[o].y-qiu[o].r) && mi[i].y <(qiu[o].y+qiu[o].r) )	{
+				mi.splice(i,1);
+				qiu[o].r=(qiu[o].r+mi[i].r*0.5);
+				qiu[o].speed=initspeed*daxiao/qiu[o].r;
+			}
+//			if(1==1){
+//				alert("nihao");
+//			}		
+		}
+	}
+	
+}	
+	
+function qiu(x,y,r,yanse,speed){
 	this.x=x;
 	this.y=y;
 	this.r=r;
+	this.yanse=yanse;
+	this.speed=speed;
+}
+
+qiu.prototype.set=function(x,y,r,sp){
+	this.x=x;
+	this.y=y;
+	this.r=r;
+	this.speed=sp;
 };
 
 $( document ).ready(function() {        
 		birth();
-        drawYuanQuan(ctx,x,y,daxiao);
+		game.generate("yellow");
+//		alert("hahh");
+		setInterval(function(){game.sami();},5000);
+		document.addEventListener("mousemove",function(e){ game.run(e);}, false);
+		$( document ).keydown(function(event){
+			 var key_code = event.keyCode;
+			 if (key_code==32)
+			 {
+				game.fenlie();
+			 } else {
+				alert(key_code);	 
+			 }
+			 
+			});
+
 });
 
 function birth(){
@@ -48,9 +120,9 @@ function drawFangKuai(ctx,x,y ,r){
     ctx.fillRect(x, y, x+r, y+r);
 }
 
-function drawYuanQuan(ctx,x,y,r){
+function drawYuanQuan(ctx,x,y,r,color){
 	ctx.beginPath();
-    ctx.fillStyle = "yellow";
+    ctx.fillStyle = color;
     ctx.arc(x, y, r, 0,360,false);
     ctx.fill();
 }
@@ -59,22 +131,24 @@ function qingli(ctx,x,y){
 	ctx.clearRect(0,0,x,y);
 }
 
-function doMouseMove(e){
-	e=e||window.event;
-	ox = x;
-	oy = y;
+function doMouseMove(e,qi){
+	var ox = qi.x;
+	var oy = qi.y;
 	var lx = Math.abs(e.pageX-ox);
 	var ly = Math.abs(e.pageY-oy);
-	var movex = ((e.pageX > ox)? (speed*lx /(lx + ly)) : ((-speed)*lx /(lx + ly))) ;
-	var movey = ((e.pageY > oy)? (speed*ly /(lx + ly)) : ((-speed)*ly /(lx + ly))) ;
-	x = ox+movex;
-    y = oy+movey;
-
-	qingli(ctx,10000,10000);
-	drawYuanQuan(ctx,x,y,daxiao);
+//	alert("nihao"+e.pageX);
+	var movex = ((e.pageX > ox)? (qi.speed*lx /(lx + ly)) : ((-qi.speed)*lx /(lx + ly))) ;
+	var movey = ((e.pageY > oy)? (qi.speed*ly /(lx + ly)) : ((-qi.speed)*ly /(lx + ly))) ;
+	qi.set(ox+movex,oy+movey,qi.r,qi.speed);
+//	qingli(ctx,10000,10000);
+	drawYuanQuan(ctx,qi.x,qi.y,qi.r,qi.yanse);
 }
 
-document.addEventListener("mousemove",doMouseMove , false);
+function doKeyDown(event){
+	var event=event || event;
+		alert(event.KeyCode);
+	
+}
 
 </script>
 </body>
