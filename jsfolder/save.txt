@@ -26,3 +26,31 @@ function qiu(){
 	this.r;
 	this.yanse;
 }
+
+				if( zuidadeqiu === undefined || zuidadeqiu.r < qius[q].r) {
+					zuidadeqiu = qius[q];
+					alert("nija");
+				}
+				
+				
+			var lx = Math.abs(e.pageX-cx);
+			var ly = Math.abs(e.pageY-cy);
+			var movex = (zuidadeqiu.r*lx /(lx + ly)) ;
+			var movey = (zuidadeqiu.r*ly /(lx + ly));
+			movex = ((e.pageX > cx)?movex : -movex);
+			movey = ((e.pageY > cy)?movey : -movey);
+			
+			
+	for(var o in qiu){
+		for (var i in mi){		
+			if(mi[i].x > (qiu[o].x-qiu[o].r) && mi[i].x < (qiu[o].x+qiu[o].r) && mi[i].y> (qiu[o].y-qiu[o].r) && mi[i].y <(qiu[o].y+qiu[o].r) )	{
+				
+				
+				mi.splice(i,1);
+				qiu[o].r=(qiu[o].r+mi[i].r*0.5);
+				qiu[o].speed=initspeed*daxiao/qiu[o].r;
+			}	
+		}
+	}			
+							
+				
